@@ -1,117 +1,42 @@
-# 🧩 Minimal Node.js JSON API
+# 📁 JSON File API (Node.js + Swagger UI)
 
-A super lightweight Node.js REST API with **no dependencies**, built using only the native `http`, `fs`, and `os` modules.
-It serves multiple JSON files dynamically via routes like `/1`, `/2`, `/3`, etc.
-
-Perfect for **local API testing**, **Flutter integration**, or **mobile device network testing**.
+A lightweight Node.js server built using the native `http` module.
+It provides a JSON-based API for reading and writing `.json` files and includes fully integrated **Swagger API documentation**.
 
 ---
 
 ## 🚀 Features
 
-- ⚙️ Pure Node.js — no Express or extra packages
-- 🌐 Auto-detects your local IP for easy mobile access
-- 🧾 Logs every API request with timestamp
-- 📂 Dynamically serves multiple JSON files (`/1`, `/2`, `/3`, etc.)
-- 🔁 Works offline within your Wi-Fi network
+- 📡 **GET /:id** — Read a JSON file by ID
+- 📝 **POST /save/:id** — Save JSON data to a file
+- 🏠 **GET /hello** — Basic welcome endpoint
+- 📄 **Automatic Swagger UI documentation** at `/docs`
+- 💾 Saves JSON files into `/data` directory
+- ⚡ No Express or frameworks — pure Node.js
+- 🌐 Works on both local and network IP addresses
 
 ---
 
-## 📁 Folder Structure
+## 📦 Project Structure
 
 ```
-my-node-api/
-├── server.js
-└── data/
-    ├── 1.json
-    ├── 2.json
-    ├── 3.json
-    ├── 4.json
-    └── 5.json
+project/
+├── data/                 # Saved JSON files
+├── swagger/
+│   └── swagger.json      # OpenAPI documentation
+├── package.json
+├── server.js             # Main server
+└── README.md
 ```
 
 ---
 
-## 🧰 Example JSON (`data/1.json`)
+## 🛠️ Installation
 
-```json
-{
-  "id": 1,
-  "title": "Flutter Developer",
-  "skills": ["Dart", "Flutter", "Firebase"]
-}
-```
-
-You can create up to 5 files like `2.json`, `3.json`, etc.
-
----
-
-## ⚙️ Server Setup (`server.js`)
-
-This script:
-
-- Logs every request
-- Detects your local network IP
-- Dynamically serves `/1` → `data/1.json`, `/2` → `data/2.json`, etc.
-
-```js
-import http from "http";
-import os from "os";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-function getLocalIp() {
-  const nets = os.networkInterfaces();
-  for (const name of Object.keys(nets)) {
-    for (const net of nets[name]) {
-      if (net.family === "IPv4" && !net.internal) return net.address;
-    }
-  }
-  return "localhost";
-}
-
-const server = http.createServer((req, res) => {
-  const now = new Date().toISOString();
-  console.log(`[${now}] ${req.method} ${req.url}`);
-
-  if (req.url === "/" || req.url === "/hello") {
-    res.writeHead(200, { "Content-Type": "application/json" });
-    return res.end(JSON.stringify({ message: "Welcome to the JSON API!" }));
-  }
-
-  const match = req.url.match(/^\/(\d+)$/);
-  if (req.method === "GET" && match) {
-    const fileId = match[1];
-    const filePath = path.join(__dirname, "data", `${fileId}.json`);
-
-    fs.readFile(filePath, "utf8", (err, data) => {
-      if (err) {
-        res.writeHead(404, { "Content-Type": "application/json" });
-        return res.end(
-          JSON.stringify({ error: `File ${fileId}.json not found` })
-        );
-      }
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(data);
-    });
-    return;
-  }
-
-  res.writeHead(404, { "Content-Type": "application/json" });
-  res.end(JSON.stringify({ error: "Not Found" }));
-});
-
-const PORT = 3000;
-server.listen(PORT, () => {
-  const ip = getLocalIp();
-  console.log(`✅ Server running:
-  - Local:   http://localhost:${PORT}/1
-  - Network: http://${ip}:${PORT}/1`);
-});
+```bash
+git clone <your-repo-url>
+cd <project-folder>
+npm install
 ```
 
 ---
@@ -122,51 +47,124 @@ server.listen(PORT, () => {
 node server.js
 ```
 
-You’ll see something like:
+You will see output similar to:
 
 ```
-✅ Server running:
-  - Local:   http://localhost:3000/1
-  - Network: http://192.168.1.5:3000/1
+Server running:
+  - API: http://localhost:3000/hello
+  - Swagger docs: http://localhost:3000/docs
+  - Swagger JSON: http://localhost:3000/swagger.json
 ```
 
 ---
 
-## 🌐 Accessing from Your Phone
+## 📚 API Documentation (Swagger UI)
 
-1. Make sure your **Mac and phone are on the same Wi-Fi network**.
-2. Open the **Network URL** (e.g., `http://192.168.1.5:3000/1`) in your mobile browser or Flutter app.
-3. You’ll see the JSON response from the corresponding file.
+Swagger UI is automatically hosted at:
 
----
+👉 **[http://localhost:3000/docs](http://localhost:3000/docs)**
 
-## 🧹 Troubleshooting
+The raw OpenAPI file is available at:
 
-- **No response on phone?**
-
-  - Allow “Node.js” through macOS Firewall (`System Settings → Network → Firewall → Options`).
-  - Ensure both devices are on the same Wi-Fi network.
-
-- **File not found?**
-
-  - Make sure the file exists in the `data` folder and is named correctly (e.g. `3.json` → `/3`).
+👉 **[http://localhost:3000/swagger.json](http://localhost:3000/swagger.json)**
 
 ---
 
-## 🧠 Bonus Ideas
+## 🔌 API Endpoints
 
-- Add `/all` route to combine all JSONs into a single response.
-- Use `ngrok` to expose your local server to the internet:
+### **1. GET /hello**
 
-  ```bash
-  npm install -g ngrok
-  ngrok http 3000
-  ```
+Returns a basic welcome message.
 
-- Use it as a **mock API** for Flutter or React apps.
+**Response:**
+
+```json
+{ "message": "Welcome to the JSON API!" }
+```
 
 ---
 
-**Author:** Cizer Thapa
-**License:** MIT
-# Mocker_API
+### **2. GET /:id**
+
+Reads a JSON file from the `data` folder.
+
+Example:
+`GET /1` → reads `data/1.json`
+
+**Response Example:**
+
+```json
+{
+  "name": "John",
+  "age": 25
+}
+```
+
+---
+
+### **3. POST /save/:id**
+
+Stores JSON sent in request body into a file.
+
+Example:
+`POST /save/5` → saves into `data/5.json`
+
+**Example Request:**
+
+```bash
+curl -X POST http://localhost:3000/save/5 \
+  -H "Content-Type: application/json" \
+  -d '{ "title": "My Data", "value": 123 }'
+```
+
+**Response:**
+
+```json
+{ "message": "Saved successfully" }
+```
+
+---
+
+## 🗃️ Data Storage
+
+All saved files go into:
+
+```
+/data
+  ├── 1.json
+  ├── 2.json
+  ├── 5.json
+  └── ...
+```
+
+Files are automatically created if they don’t exist.
+
+---
+
+## 🧩 Swagger Documentation
+
+Swagger UI is served using:
+
+- `swagger-ui-dist` (static frontend)
+- Custom endpoint serving `/swagger.json`
+
+The Swagger file lives at:
+
+```
+swagger/swagger.json
+```
+
+You can edit this file to define or update API routes.
+
+---
+
+## 🤝 Contribution
+
+Feel free to open pull requests or issues.
+Suggestions are welcome!
+
+---
+
+## 📄 License
+
+MIT License — free to use, modify, and distribute.
