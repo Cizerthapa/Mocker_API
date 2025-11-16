@@ -1,0 +1,62 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Simple JSON File API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/hello": {
+      "get": {
+        "summary": "Welcome message",
+        "responses": {
+          "200": {
+            "description": "Welcome message"
+          }
+        }
+      }
+    },
+
+    "/{id}": {
+      "get": {
+        "summary": "Get JSON file by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "JSON data returned" },
+          "404": { "description": "File not found" }
+        }
+      }
+    },
+
+    "/save/{id}": {
+      "post": {
+        "summary": "Save JSON to file",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "type": "object" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "File saved successfully" }
+        }
+      }
+    }
+  }
+}
