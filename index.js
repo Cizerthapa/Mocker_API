@@ -241,6 +241,7 @@ const PORT = 3000;
 server.listen(PORT, () => {
   const ip = getLocalIp();
   console.log(`Server running:
+  - Ip Address: http://${ip}:${PORT}
   - API: http://localhost:${PORT}/hello
   - Swagger docs: http://localhost:${PORT}/docs
   - Swagger JSON: http://localhost:${PORT}/swagger.json
