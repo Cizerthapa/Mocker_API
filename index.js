@@ -255,16 +255,6 @@ server.listen(PORT, () => {
       );
     } else {
       console.log(`[STARTUP] swagger.json found at: ${swaggerJsonPath}`);
-
-      // Log the contents of swagger.json for verification
-      fs.readFile(swaggerJsonPath, "utf8", (err, data) => {
-        if (!err) {
-          console.log(
-            `[STARTUP] swagger.json contents preview:`,
-            data.substring(0, 200) + "..."
-          );
-        }
-      });
     }
   });
 });
